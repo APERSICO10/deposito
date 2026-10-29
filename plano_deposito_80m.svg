@@ -12,7 +12,10 @@
 <rect x="201" y="41" width="196" height="11" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
 <g fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"><rect x="201" y="98.3" width="142" height="24.2"/><rect x="201" y="168.7" width="142" height="24.2"/><rect x="201" y="239.1" width="142" height="24.2"/><rect x="201" y="309.5" width="142" height="24.2"/></g>
 <g fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"><rect x="222" y="388.7" width="121" height="27"/><rect x="222" y="416.7" width="121" height="27"/></g>
-<rect x="201" y="443.7" width="142" height="88" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<rect x="201" y="443.7" width="110" height="60.5" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<path d="M311 443.7 H343 V531.7 H201 V504.2 H311 Z" fill="#B5D4F4" fill-opacity="0.45" stroke="#0F6E56" stroke-width="0.5"/>
+<g fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"><rect x="203.2" y="444.7" width="77" height="11"/><rect x="203.2" y="492.2" width="77" height="11"/><rect x="203.2" y="505.2" width="77" height="9"/></g>
+<g stroke="#ffffff" stroke-width="3"><line x1="311" y1="455.8" x2="311" y2="478.9"/><line x1="343" y1="455.8" x2="343" y2="478.9"/></g>
 <rect x="201" y="531.7" width="54" height="33" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="0.5"/>
 <rect x="204" y="569" width="190" height="347" fill="none" stroke="#888780" stroke-width="0.5" stroke-dasharray="4 4"/>
 <text x="299" y="710" text-anchor="middle" font-size="14" font-weight="500">Playa de</text>
@@ -45,7 +48,8 @@
 <text x="436" y="412">2 contenedores 11 × 2,5 m</text>
 <text x="436" y="428">a 2 m de la pared izquierda</text>
 <text x="436" y="484">Cámara y precámara</text>
-<text x="436" y="500">13 × 8 m</text>
+<text x="436" y="500">13 × 8 m · cámara 10 × 5,5 m</text>
+<text x="436" y="516">racks 4 × 3 (2) y 4 × 2 en precámara</text>
 <text x="436" y="552">Oficina 5 × 3 m</text>
 <text x="436" y="604">Pasillo lateral 5 m</text>
 <text x="436" y="811">Escalera: sube por la pared</text>
