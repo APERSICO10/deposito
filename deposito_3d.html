@@ -61,7 +61,7 @@ box(18,0.1,80,0,-0.1,0,0xd3d1c7,1,false);
 box(18,0.02,32.3,0,0,47.7,0xb4b2a9,1,false);
 for(let z=50;z<70;z+=3){box(4.6,0.03,0.1,0.2,0.02,z,0xffffff,1,false);}
 for(let i=0;i<8;i++){box(0.25,0.03,1.6,8.9,0.02,50+i*2.6,0xfac775,1,false);}
-const wc=0x888780,wo=0.12,H=7;
+const wc=0x888780,wo=0.12,H=8.5;
 box(0.2,H,80,-0.2,0,0,wc,wo);box(0.2,H,80,18,0,0,wc,wo);box(18.4,H,0.2,-0.2,0,-0.2,wc,wo);
 box(5.2,H,0.2,-0.2,0,80,wc,wo);box(5.2,H,0.2,13,0,80,wc,wo);box(8,H-4.5,0.2,5,4.5,80,wc,wo);
 box(8,0.2,0.3,5,4.4,79.95,0x185fa5);box(0.2,4.4,0.3,5,0,79.95,0x185fa5);box(0.2,4.4,0.3,12.8,0,79.95,0x185fa5);
@@ -82,24 +82,24 @@ rack(0,5.3,13,2.2,6,true);rack(0,11.7,13,2.2,6,true);rack(0,18.1,13,2.2,6,true);
 box(11,2.6,2.45,2,0,31.7,0x1f5fa8);box(11,2.6,2.45,2,0,34.25,0x2a6fbf);
 box(13,4,8,0,0,36.7,0xd8ecf2,0.95);
 box(5,3,3,0,0,44.7,0x9c9a92);
-box(18,0.25,6,0,3,74,0x888780);
-box(18,2.8,6,0,3.25,74,0x7f77dd,0.35);
-const rise=1.5/9,tr=2.5/9,st=0xd85a30;
-for(let i=0;i<9;i++)box(1.2,(i+1)*rise,tr,0,0,70.3+i*tr,st,1,false);
-box(1.2,1.5,1.2,0,0,72.8,0xf0997b);
-for(let i=0;i<9;i++)box(tr,1.5+(i+1)*rise,1.2,1.2+i*tr,0,72.8,st,1,false);
+box(18,0.25,6,0,4.6,74,0x888780);
+box(18,2.8,6,0,4.85,74,0x7f77dd,0.35);
+const rise=2.3/13,tr=3.6/13,st=0xd85a30;
+for(let i=0;i<13;i++)box(1.2,(i+1)*rise,tr,0,0,69.2+i*tr,st,1,false);
+box(1.2,2.3,1.2,0,0,72.8,0xf0997b);
+for(let i=0;i<13;i++)box(tr,2.3+(i+1)*rise,1.2,1.2+i*tr,0,72.8,st,1,false);
 label('Rack pared de fondo',9,6.4,0.5);
 label('Racks dobles',6.5,6.4,16);
 label('Contenedores',7.5,4.2,34.2);
 label('Cámara',6.5,5.6,40.7);
 label('Oficina',2.5,4.4,46.2,0.8);
 label('Playa de estacionamiento',9,2.2,62);
-label('Oficinas 1er piso',9,7.6,77);
-label('Escalera',2,4.2,70,0.8);
+label('Oficinas 1er piso',9,9.2,77);
+label('Escalera',2,5,69.5,0.8);
 label('Portón 8 m',9,5.6,81);
 const T=new THREE.Vector3(9,0,40);let th=0.6,ph=0.9,rad=95;
 function upd(){cam.position.set(T.x+rad*Math.sin(ph)*Math.sin(th),T.y+rad*Math.cos(ph),T.z+rad*Math.sin(ph)*Math.cos(th));cam.lookAt(T);}
-const V={aerea:[9,0,40,0.6,0.9,95],porton:[9,1.5,45,0,1.38,48],racks:[8,1,15,0.75,1.05,40],frente:[6,2,74,0.9,1.1,24],planta:[9,0,40,0,0.001,105]};
+const V={aerea:[9,0,40,0.6,0.9,95],porton:[9,1.5,45,0,1.38,48],racks:[8,1,15,0.75,1.05,40],frente:[6,3,73,0.9,1.15,28],planta:[9,0,40,0,0.001,105]};
 let anim=null;
 function setView(n){const v=V[n];anim={f:[T.x,T.y,T.z,th,ph,rad],t:v,k:0};}
 let drag=null;const pts=new Map();
