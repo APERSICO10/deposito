@@ -11,12 +11,12 @@ Layout del depósito de 80 × 18 m.
 |---|---|
 | Rack pared de fondo | 8 posiciones × 3 alturas, todo el ancho |
 | Pasillo | 4,2 m |
-| 3 racks dobles | 6 posiciones × 3 alturas c/u, de la pared izquierda hasta 13 m, pasillos de 4,2 m |
+| 4 racks dobles | 6 posiciones × 3 alturas c/u, de la pared izquierda hasta 13 m, pasillos de 4,2 m |
 | Pasillo hasta contenedores | 5 m |
 | 2 contenedores | 11 × 2,5 m, a 2 m de la pared izquierda |
 | Cámara y precámara | 13 × 8 m, pegada a la pared izquierda |
 | Oficina planta baja | 5 × 3 m, pegada a la cámara |
-| Playa de estacionamiento | ≈ 39 × 18 m, hasta el portón |
+| Playa de estacionamiento | ≈ 32 × 18 m, hasta el portón |
 | Oficinas 1er piso | todo el ancho sobre el frente |
 
 - Pasillo lateral de 5 m sobre la pared derecha, del portón al fondo.
