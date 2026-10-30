@@ -2,134 +2,230 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Depósito 3D</title>
-<style>
-:root{--bg:#f6f5f1;--panel:#ffffff;--text:#2c2c2a;--muted:#5f5e5a;--border:#d3d1c7}
-@media (prefers-color-scheme: dark){:root{--bg:#1f1f1d;--panel:#2c2c2a;--text:#f1efe8;--muted:#b4b2a9;--border:#444441}}
-body{margin:0;padding:16px;background:var(--bg);color:var(--text);font-family:Segoe UI,Arial,sans-serif}
-#wrap{position:relative;width:100%;height:calc(100vh - 110px);min-height:420px;border-radius:12px;overflow:hidden;background:var(--panel);border:1px solid var(--border)}
-canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
-.bar{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
-button{font:inherit;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer}
-.ayuda{font-size:13px;color:var(--muted)}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Depósito de racks y depósito de 20 × 80 m: vista 3D en conjunto.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
-<div id="wrap"><canvas id="c"></canvas></div>
-<div class="bar">
-<button onclick="setView('aerea')">Vista aérea</button>
-<button onclick="setView('porton')">Desde el portón</button>
-<button onclick="setView('racks')">Racks</button>
-<button onclick="setView('camara')">Cámara</button>
-<button onclick="setView('frente')">Oficinas y escalera</button>
-<button onclick="setView('planta')">Planta</button>
-<span class="ayuda">Arrastrá para girar · rueda o pellizco para zoom · shift + arrastrar para mover</span>
+<title>Depósitos en conjunto</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: hoja técnica — encabezado corto, vista 3D de los dos depósitos a ancho completo, dos fichas de medidas abajo */
+:root{
+  --bg:#f4f5f3; --panel:#ffffff; --fg:#22262a; --muted:#5d656c; --line:#d5d9d6; --accent:#c4561d;
+  --f-body:"IBM Plex Sans",system-ui,"Segoe UI",Arial,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#16191b; --panel:#1f2326; --fg:#e8eae7; --muted:#a3aaa6; --line:#353b3f; --accent:#ec7a40; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#16191b; --panel:#1f2326; --fg:#e8eae7; --muted:#a3aaa6; --line:#353b3f; --accent:#ec7a40; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;border-bottom:1px solid var(--line);padding-bottom:14px}
+h1{font-size:clamp(22px,4vw,30px);font-weight:600;margin:0;text-wrap:balance}
+.cota{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.cota b{color:var(--accent);font-weight:500}
+h2{font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}
+.visor{position:relative;height:min(72vh,640px);min-height:380px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+.visor canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.vistas{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.vistas button{font:500 13px var(--f-body);padding:7px 12px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+.vistas button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.vistas button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ayuda{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.hoja{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.nota{font-size:13px;color:var(--muted);margin:0}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Depósitos en conjunto</h1>
+    <span class="cota">RACKS <b>20 × 60 m</b> + patio · DEPÓSITO <b>20 × 80 m</b> · fondos alineados</span>
+  </header>
+  <section>
+    <h2>Vista 3D</h2>
+    <div class="visor"><canvas id="c" aria-label="Vista 3D de los dos depósitos"></canvas></div>
+    <div class="vistas" role="group" aria-label="Vistas">
+      <button id="v-aerea" data-v="aerea" aria-pressed="true">Vista aérea</button>
+      <button id="v-frente" data-v="frente">Desde la calle</button>
+      <button id="v-puerta" data-v="puerta">Puerta entre depósitos</button>
+      <button id="v-racksA" data-v="racksA">Depósito de racks</button>
+      <button id="v-camara" data-v="camara">Cámara</button>
+      <button id="v-planta" data-v="planta">Planta</button>
+      <span class="ayuda">Arrastrá para girar · pellizcá o usá la rueda para acercar · dos dedos o shift para mover</span>
+    </div>
+  </section>
+  <div class="grid">
+    <section class="hoja">
+      <h2>Depósito de racks (izquierda)</h2>
+      <ul>
+        <li>Rack simple contra la pared izquierda: 23 × 3</li>
+        <li>Rack doble: 17 × 3 por cara</li>
+        <li>Rack doble: 11 × 3 por cara</li>
+        <li>Contra la pared derecha: picking de 11 posiciones, la puerta de 2 × 2 m al otro depósito y la pared divisoria pegada a la puerta</li>
+        <li>Pasando la pared divisoria: rack simple 8 × 3</li>
+        <li>Portón, patio de unos 15 m y portón a la calle</li>
+      </ul>
+    </section>
+    <section class="hoja">
+      <h2>Depósito 20 × 80 m (derecha)</h2>
+      <ul>
+        <li>Rack de pared de fondo 8 × 3 de pared a pared y 5 racks dobles 6 × 3 de 15 m, alineados con la precámara, con pasillos de 4,5 m; la puerta del depósito de racks da al pasillo entre el rack doble 4 y el 5</li>
+        <li>2 contenedores de 13 × 2,5 m con 25 cm entre ellos, a unos 4,4 m del rack doble 5 y a unos 85 cm de la cámara</li>
+        <li>Cámara de 12 m desde la pared izquierda × 6 m, en el mismo sentido que los contenedores y al lado de ellos, con 2 racks de 4 × 3 contra las paredes largas, dentro de una precámara en L de 15 m de ancho y 15 m de fondo con un rack de 2 niveles; pasillo lateral de 5 m; el frente de la precámara queda a 60 m del fondo</li>
+        <li>Oficina, playa de estacionamiento de unos 17 m, escalera y oficinas en el 1er piso</li>
+        <li>Portón de 8 m a la calle</li>
+      </ul>
+    </section>
+  </div>
+  <p class="nota">Medidas del depósito de racks estimadas desde el croquis (ancho de 20 m, posiciones de 2,6 m, portones). Las paredes del fondo de los dos depósitos están sobre la misma línea, y el primer portón del depósito de racks queda a la par del frente de la precámara.</p>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+(function(){
 const cv=document.getElementById('c');
-const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+let R;
+try{R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});}catch(e){cv.parentNode.innerHTML='<p style="padding:20px;color:var(--muted)">Este navegador no puede mostrar la vista 3D.</p>';return;}
 R.setPixelRatio(Math.min(devicePixelRatio,2));
 const S=new THREE.Scene();
-const cam=new THREE.PerspectiveCamera(45,1,0.1,600);
+const cam=new THREE.PerspectiveCamera(45,1,0.1,900);
 S.add(new THREE.HemisphereLight(0xffffff,0x777777,0.85));
-const dl=new THREE.DirectionalLight(0xffffff,0.55);dl.position.set(-30,60,25);S.add(dl);
+const dl=new THREE.DirectionalLight(0xffffff,0.55);dl.position.set(-40,80,30);S.add(dl);
 const edgeMat=new THREE.LineBasicMaterial({color:0x2c2c2a,transparent:true,opacity:0.35});
+let G=S;
 function box(w,h,d,x,y,z,color,op,edges){
   op=op===undefined?1:op;
   const m=new THREE.MeshLambertMaterial({color:color,transparent:op<1,opacity:op,depthWrite:op>=1});
-  const g=new THREE.BoxGeometry(w,h,d);
-  const mesh=new THREE.Mesh(g,m);
-  mesh.position.set(x+w/2,y+h/2,z+d/2);S.add(mesh);
-  if(edges!==false){const e=new THREE.LineSegments(new THREE.EdgesGeometry(g),edgeMat);e.position.copy(mesh.position);S.add(e);}
-  return mesh;
+  const g=new THREE.BoxGeometry(w,h,d);const mesh=new THREE.Mesh(g,m);
+  mesh.position.set(x+w/2,y+h/2,z+d/2);G.add(mesh);
+  if(edges!==false){const e=new THREE.LineSegments(new THREE.EdgesGeometry(g),edgeMat);e.position.copy(mesh.position);G.add(e);}
 }
 function label(txt,x,y,z,sc){
-  sc=sc||1;
-  const c=document.createElement('canvas');c.width=512;c.height=112;
-  const k=c.getContext('2d');k.font='500 40px sans-serif';
-  const w=Math.min(500,k.measureText(txt).width+44);
-  k.fillStyle='rgba(255,255,255,0.92)';k.strokeStyle='rgba(0,0,0,0.25)';k.lineWidth=2;
-  const x0=(512-w)/2;k.beginPath();k.roundRect?k.roundRect(x0,18,w,76,16):k.rect(x0,18,w,76);k.fill();k.stroke();
-  k.fillStyle='#2c2c2a';k.textAlign='center';k.textBaseline='middle';k.fillText(txt,256,57);
-  const t=new THREE.CanvasTexture(c);
-  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true}));
-  sp.position.set(x,y,z);sp.scale.set(9*sc,1.97*sc,1);sp.renderOrder=10;S.add(sp);
+  sc=sc||1;const c=document.createElement('canvas');c.width=512;c.height=112;
+  const k=c.getContext('2d');k.font='500 40px "IBM Plex Sans", sans-serif';
+  const w=Math.min(500,k.measureText(txt).width+44),x0=(512-w)/2;
+  k.fillStyle='rgba(255,255,255,0.93)';k.strokeStyle='rgba(0,0,0,0.25)';k.lineWidth=2;
+  k.beginPath();if(k.roundRect)k.roundRect(x0,18,w,76,14);else k.rect(x0,18,w,76);k.fill();k.stroke();
+  k.fillStyle='#22262a';k.textAlign='center';k.textBaseline='middle';k.fillText(txt,256,57);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));
+  sp.position.set(x,y,z);sp.scale.set(9*sc,1.97*sc,1);sp.renderOrder=10;G.add(sp);
 }
-// Coordenadas en metros: x = ancho desde la pared izquierda, z = largo desde el fondo, y = altura
-box(18,0.1,80,0,-0.1,0,0xd3d1c7,1,false);
-box(18,0.02,32.3,0,0,47.7,0xb4b2a9,1,false);
-for(let z=50;z<70;z+=3){box(4.6,0.03,0.1,0.2,0.02,z,0xffffff,1,false);}
-for(let i=0;i<8;i++){box(0.25,0.03,1.6,8.9,0.02,50+i*2.6,0xfac775,1,false);}
-const wc=0x888780,wo=0.12,H=8.5;
-box(0.2,H,80,-0.2,0,0,wc,wo);box(0.2,H,80,18,0,0,wc,wo);box(18.4,H,0.2,-0.2,0,-0.2,wc,wo);
-box(5.2,H,0.2,-0.2,0,80,wc,wo);box(5.2,H,0.2,13,0,80,wc,wo);box(8,H-4.5,0.2,5,4.5,80,wc,wo);
-box(8,0.2,0.3,5,4.4,79.95,0x185fa5);box(0.2,4.4,0.3,5,0,79.95,0x185fa5);box(0.2,4.4,0.3,12.8,0,79.95,0x185fa5);
-function rack(x0,z0,len,dep,n,dbl,lv,sp){
-  lv=lv||3;sp=sp||1.6;const pw=len/n,blue=0x185fa5,brown=0xc8a06a,hh=lv*sp,ph=Math.min(1.15,sp-0.35);
+const blue=0x185fa5,brown=0xc8a06a,beam=0xef9f27,wc=0xffffff,wo=0.45;
+// Racks que corren a lo ancho (depósito 18 × 80)
+function rackX(x0,z0,len,dep,n,dbl,lv,sp){
+  lv=lv||3;sp=sp||1.6;const pw=len/n,hh=lv*sp,ph=Math.min(1.15,sp-0.35);
   for(let i=0;i<=n;i++){box(0.1,hh,0.1,x0+i*pw-0.05,0,z0,blue,1,false);box(0.1,hh,0.1,x0+i*pw-0.05,0,z0+dep-0.1,blue,1,false);}
-  for(let l=0;l<lv;l++){
-    const y=0.15+l*sp;
-    box(len,0.1,0.08,x0,y-0.1,z0,0xef9f27,1,false);box(len,0.1,0.08,x0,y-0.1,z0+dep-0.08,0xef9f27,1,false);
+  for(let l=0;l<lv;l++){const y=0.15+l*sp;
+    box(len,0.1,0.08,x0,y-0.1,z0,beam,1,false);box(len,0.1,0.08,x0,y-0.1,z0+dep-0.08,beam,1,false);
     for(let i=0;i<n;i++){
       if(dbl){box(pw-0.35,ph,dep/2-0.2,x0+i*pw+0.17,y,z0+0.1,brown);box(pw-0.35,ph,dep/2-0.2,x0+i*pw+0.17,y,z0+dep/2+0.1,brown);}
-      else box(pw-0.35,ph,dep-0.2,x0+i*pw+0.17,y,z0+0.1,brown);
-    }
-  }
+      else box(pw-0.35,ph,dep-0.2,x0+i*pw+0.17,y,z0+0.1,brown);}}
 }
-rack(0,0,18,1.1,8,false);
-rack(0,5.3,13,2.2,6,true);rack(0,11.7,13,2.2,6,true);rack(0,18.1,13,2.2,6,true);rack(0,24.5,13,2.2,6,true);
-box(11,2.6,2.45,2,0,31.7,0x1f5fa8);box(11,2.6,2.45,2,0,34.25,0x2a6fbf);
-box(10,4,5.5,0,0,36.7,0xbfe3f0,0.35);
-box(3,0.02,8,10,0.01,36.7,0xd6e6f5,0.35,false);box(10,0.02,2.5,0,0.01,42.2,0xd6e6f5,0.35,false);
-box(13,4,0.1,0,0,44.6,0xd6e6f5,0.3);box(0.1,4,8,12.9,0,36.7,0xd6e6f5,0.3);box(3,4,0.1,10,0,36.7,0xd6e6f5,0.3);
-box(0.15,2.4,2.1,9.93,0,37.8,0x185fa5);box(0.15,2.4,2.1,12.93,0,37.8,0x185fa5);
-rack(0.2,36.8,7,1,4,false,3,1.2);rack(0.2,41.1,7,1,4,false,3,1.2);rack(0.2,42.3,7,1,4,false,2,1.2);
-box(5,3,3,0,0,44.7,0x9c9a92);
-box(18,0.25,6,0,4.6,74,0x888780);
-box(18,2.8,6,0,4.85,74,0x7f77dd,0.35);
+// Racks que corren a lo largo (depósito de racks)
+function rackZ(x0,z0,dep,n,dbl,lv,sp,bay){
+  lv=lv||3;sp=sp||1.6;const B=bay||2.6,len=n*B,hh=lv*sp,ph=Math.min(1.15,sp-0.35);
+  for(let i=0;i<=n;i++){box(0.1,hh,0.1,x0,0,z0+i*B-0.05,blue,1,false);box(0.1,hh,0.1,x0+dep-0.1,0,z0+i*B-0.05,blue,1,false);}
+  for(let l=0;l<lv;l++){const y=0.15+l*sp;
+    box(0.08,0.1,len,x0,y-0.1,z0,beam,1,false);box(0.08,0.1,len,x0+dep-0.08,y-0.1,z0,beam,1,false);
+    for(let i=0;i<n;i++){
+      if(dbl){box(dep/2-0.2,ph,B-0.35,x0+0.1,y,z0+i*B+0.17,brown);box(dep/2-0.2,ph,B-0.35,x0+dep/2+0.1,y,z0+i*B+0.17,brown);}
+      else box(dep-0.2,ph,B-0.35,x0+0.1,y,z0+i*B+0.17,brown);}}
+}
+
+// ===== Depósito 18 × 80 (x 0..18, z 0..80) =====
+G=new THREE.Group();S.add(G);
+{const H=8.5;
+box(20,0.1,80,0,-0.1,0,0xd3d1c7,1,false);
+box(20,0.02,17,0,0,63,0xb4b2a9,1,false);
+for(let z=64;z<69;z+=3)box(4.6,0.03,0.1,0.2,0.02,z,0xffffff,1,false);
+for(let i=0;i<4;i++)box(0.25,0.03,1.6,8.9,0.02,64+i*2.6,0xfac775,1,false);
+box(0.2,H,29.2,-0.2,0,0,wc,wo);box(0.2,H,48.8,-0.2,0,31.2,wc,wo);box(0.2,H-2,2,-0.2,2,29.2,wc,wo);
+box(0.2,H,80,20,0,0,wc,wo);box(20.4,H,0.2,-0.2,0,-0.2,wc,wo);
+box(5.2,H,0.2,-0.2,0,80,wc,wo);box(7.2,H,0.2,13,0,80,wc,wo);box(8,H-4.5,0.2,5,4.5,80,wc,wo);
+box(8,0.2,0.3,5,4.4,79.95,blue);box(0.2,4.4,0.3,5,0,79.95,blue);box(0.2,4.4,0.3,12.8,0,79.95,blue);
+rackX(0,0,20,1.1,8,false);rackX(0,5.6,15,2.2,6,true);rackX(0,12.3,15,2.2,6,true);rackX(0,19,15,2.2,6,true);rackX(0,25.7,15,2.2,6,true);rackX(0,32.4,15,2.2,6,true);
+// Cámara + precámara: 16 m de fondo (z 44..60), con el frente a la par del primer portón del depósito de racks; contenedores pegados atrás (z 39..44)
+box(13,2.6,2.45,2,0,39,0x1f5fa8);box(13,2.6,2.45,2,0,41.7,0x2a6fbf);
+box(12,4,6,0,0,45,0xbfe3f0,0.35);
+box(3,0.02,15,12,0.01,45,0xd6e6f5,0.35,false);box(12,0.02,9,0,0.01,51,0xd6e6f5,0.35,false);
+box(15,4,0.1,0,0,59.9,0xd6e6f5,0.3);box(0.1,4,15,14.9,0,45,0xd6e6f5,0.3);box(3,4,0.1,12,0,45,0xd6e6f5,0.3);
+box(0.15,2.4,2.1,11.93,0,46.1,blue);box(0.15,2.4,2.1,14.93,0,46.1,blue);
+rackX(0.2,45.1,8,1,4,false,3,1.2);rackX(0.2,49.9,8,1,4,false,3,1.2);rackX(0.2,51.1,5.6,1,4,false,2,1.2);
+box(5,3,3,0,0,60,0x9c9a92);
+label('Contenedores',7.5,4.2,41.5);label('Cámara 12 × 6',6,5.2,48,0.85);label('Precámara 15 m de ancho',7.5,5.2,55,0.85);label('Oficina',2.5,4.4,61.5,0.8);
+box(20,0.25,6,0,4.6,74,0x888780);box(20,2.8,6,0,4.85,74,0x7f77dd,0.35);
 const rise=2.3/13,tr=3.6/13,st=0xd85a30;
 for(let i=0;i<13;i++)box(1.2,(i+1)*rise,tr,0,0,69.2+i*tr,st,1,false);
 box(1.2,2.3,1.2,0,0,72.8,0xf0997b);
 for(let i=0;i<13;i++)box(tr,2.3+(i+1)*rise,1.2,1.2+i*tr,0,72.8,st,1,false);
-label('Rack pared de fondo',9,6.4,0.5);
-label('Racks dobles',6.5,6.4,16);
-label('Contenedores',7.5,4.2,34.2);
-label('Cámara',5,5.2,39.5);
-label('Precámara',11.5,5.2,41.5,0.8);
-label('Oficina',2.5,4.4,46.2,0.8);
-label('Playa de estacionamiento',9,2.2,62);
-label('Oficinas 1er piso',9,9.2,77);
-label('Escalera',2,5,69.5,0.8);
-label('Portón 8 m',9,5.6,81);
-const T=new THREE.Vector3(9,0,40);let th=0.6,ph=0.9,rad=95;
+label('Depósito 20 × 80',10,11,40,1.2);
+label('Rack pared de fondo',9,6.4,0.5);label('Racks dobles',6.5,6.4,18);
+label('Playa de estacionamiento',9,2.2,68);
+label('Oficinas 1er piso',9,9.2,77);label('Escalera',2,5,69.5,0.8);label('Portón 8 m',9,5.6,81);}
+
+// ===== Depósito de racks (a la izquierda, fondos alineados; su primer portón queda en z 60, a la par del frente de la precámara: x -20..0, z 0..75) =====
+G=new THREE.Group();G.position.set(-20,0,0);S.add(G);
+{const ANCHO=20,NAVE=60,PATIO=15,H=8;
+box(ANCHO,0.1,NAVE,0,-0.1,0,0xd3d1c7,1,false);
+box(ANCHO,0.1,PATIO,0,-0.1,NAVE,0xa9a79e,1,false);
+box(0.2,H,NAVE,-0.2,0,0,wc,wo);box(ANCHO+0.2,H,0.2,-0.2,0,-0.2,wc,wo);
+box(6.2,H,0.2,-0.2,0,NAVE,wc,wo);box(7,H,0.2,13,0,NAVE,wc,wo);box(7,H-4.5,0.2,6,4.5,NAVE,wc,wo);
+box(7,0.2,0.3,6,4.4,NAVE-0.05,blue);box(0.2,4.4,0.3,6,0,NAVE-0.05,blue);box(0.2,4.4,0.3,12.8,0,NAVE-0.05,blue);
+box(0.2,3,PATIO,-0.2,0,NAVE,wc,0.2);
+box(6.4,3,0.2,-0.2,0,NAVE+PATIO,wc,0.2);box(4.9,3,0.2,15.1,0,NAVE+PATIO,wc,0.2);
+box(8.9,0.25,0.3,6.2,3.6,NAVE+PATIO-0.05,blue);box(0.2,3.6,0.3,6.2,0,NAVE+PATIO-0.05,blue);box(0.2,3.6,0.3,14.9,0,NAVE+PATIO-0.05,blue);
+box(2.5,H,0.25,ANCHO-2.5,0,31.5,0x534ab7,0.55);
+rackZ(0,0.5,1.1,23,false,3,1.6,(NAVE-0.4-0.5)/23);
+rackZ(4.7,0.5,2.2,17,true);
+rackZ(11.3,0.5,2.2,11,true,3,1.6,(30.5-0.5)/11);
+rackZ(ANCHO-1.1,0.3,1.1,11,false,3,1.6,(29.2-0.3-0.3)/11);
+rackZ(ANCHO-1.1,32,1.1,8,false);
+box(0.3,2,2,ANCHO-0.15,0,29.2,0xd85a30);
+label('Depósito de racks',10,11,30,1.2);
+label('Rack simple 23 × 3',0.6,6.2,32);
+label('Rack doble 17 × 3',5.8,6.2,24);
+label('Rack doble 11 × 3',12.4,6.2,16);
+label('Picking 11',19.4,6.2,15,0.85);
+label('Pared 2,5 m',18.7,8.8,31.5,0.8);
+label('Rack 8 × 3',19.4,6.2,42,0.85);
+label('Puerta al otro depósito',19.6,3.4,30.2,0.8);
+label('Portón',9.5,5.6,NAVE+0.5,0.85);
+label('Patio ≈ 15 m',10,1.4,NAVE+7.5);
+label('Portón',10.6,4.6,NAVE+PATIO+0.6,0.85);}
+
+const T=new THREE.Vector3(-1,0,40);let th=0.6,ph=0.9,rad=125;
 function upd(){cam.position.set(T.x+rad*Math.sin(ph)*Math.sin(th),T.y+rad*Math.cos(ph),T.z+rad*Math.sin(ph)*Math.cos(th));cam.lookAt(T);}
-const V={aerea:[9,0,40,0.6,0.9,95],porton:[9,1.5,45,0,1.38,48],racks:[8,1,15,0.75,1.05,40],frente:[6,3,73,0.9,1.15,28],camara:[6,1,40,0.7,0.95,22],planta:[9,0,40,0,0.001,105]};
+const V={aerea:[-1,0,40,0.6,0.9,125],frente:[-1,1.5,58,0,1.3,80],puerta:[-1,1,30,0.9,1.1,22],racksA:[-13,1,26,0.75,1.0,45],camara:[6,1,51,0.7,0.95,26],planta:[-1,0,40,0,0.001,135]};
 let anim=null;
-function setView(n){const v=V[n];anim={f:[T.x,T.y,T.z,th,ph,rad],t:v,k:0};}
-let drag=null;const pts=new Map();
-cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);drag={x:e.clientX,y:e.clientY,pan:e.shiftKey||e.button===2};cv.style.cursor='grabbing';anim=null;});
+const btns=document.querySelectorAll('.vistas button');
+btns.forEach(b=>b.addEventListener('click',()=>{const v=V[b.dataset.v];anim={f:[T.x,T.y,T.z,th,ph,rad],t:v,k:0};btns.forEach(o=>o.setAttribute('aria-pressed',o===b?'true':'false'));}));
+function chico(){return cv.clientWidth<500;}
+let drag=null;const pts=new Map();let pinch=null;
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);drag={x:e.clientX,y:e.clientY,pan:e.shiftKey||e.button===2};cv.style.cursor='grabbing';anim=null;
+  if(pts.size===2){const a=[...pts.values()];pinch={d:Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]),cx:(a[0][0]+a[1][0])/2,cy:(a[0][1]+a[1][1])/2};}});
+function pan(dx,dy){const s=rad*0.0015;T.x-=dx*s*Math.cos(th);T.z+=dx*s*Math.sin(th);T.x-=dy*s*Math.sin(th);T.z-=dy*s*Math.cos(th);}
 cv.addEventListener('pointermove',e=>{
-  if(!pts.has(e.pointerId))return;
-  if(pts.size===2){const a=[...pts.values()];const d0=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);pts.set(e.pointerId,[e.clientX,e.clientY]);const b=[...pts.values()];const d1=Math.hypot(b[0][0]-b[1][0],b[0][1]-b[1][1]);if(d0>0)rad=Math.min(160,Math.max(8,rad*d0/d1));upd();return;}
-  pts.set(e.pointerId,[e.clientX,e.clientY]);
+  if(!pts.has(e.pointerId))return;pts.set(e.pointerId,[e.clientX,e.clientY]);
+  if(pts.size===2&&pinch){const a=[...pts.values()];const d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);const cx=(a[0][0]+a[1][0])/2,cy=(a[0][1]+a[1][1])/2;
+    if(d>0)rad=Math.min(220,Math.max(8,rad*pinch.d/d));pan(cx-pinch.cx,cy-pinch.cy);pinch={d:d,cx:cx,cy:cy};upd();return;}
   const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
-  if(drag.pan){const s=rad*0.0015;const fx=Math.cos(th),fz=-Math.sin(th);T.x-=dx*s*fx;T.z-=dx*s*fz;const gx=Math.sin(th),gz=Math.cos(th);T.x-=dy*s*gx;T.z-=dy*s*gz;}
-  else{th-=dx*0.008;ph=Math.min(1.53,Math.max(0.001,ph-dy*0.006));}
-  upd();
-});
-const up=e=>{pts.delete(e.pointerId);cv.style.cursor='grab';};
+  if(drag.pan)pan(dx,dy);else{th-=dx*0.008;ph=Math.min(1.53,Math.max(0.001,ph-dy*0.006));}
+  upd();});
+const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;cv.style.cursor='grab';};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 cv.addEventListener('contextmenu',e=>e.preventDefault());
-cv.addEventListener('wheel',e=>{e.preventDefault();rad=Math.min(160,Math.max(8,rad*(1+e.deltaY*0.001)));anim=null;upd();},{passive:false});
-function rs(){const w=cv.clientWidth,h=cv.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+cv.addEventListener('wheel',e=>{e.preventDefault();rad=Math.min(220,Math.max(8,rad*(1+e.deltaY*0.001)));anim=null;upd();},{passive:false});
+function rs(){const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(chico()&&rad===125){rad=165;upd();}}
 new ResizeObserver(rs).observe(cv);rs();upd();
 (function loop(){
-  if(anim){anim.k=Math.min(1,anim.k+0.04);const e=anim.k<0.5?2*anim.k*anim.k:1-Math.pow(-2*anim.k+2,2)/2;const f=anim.f,t=anim.t,L=(i)=>f[i]+(t[i]-f[i])*e;
-    T.set(L(0),L(1),L(2));th=L(3);ph=L(4);rad=L(5);upd();if(anim.k>=1)anim=null;}
-  R.render(S,cam);requestAnimationFrame(loop);
+  if(anim){anim.k=Math.min(1,anim.k+0.04);const k=anim.k,e=k<0.5?2*k*k:1-Math.pow(-2*k+2,2)/2,f=anim.f,t=anim.t,L=i=>f[i]+(t[i]-f[i])*e;
+    T.set(L(0),L(1),L(2));th=L(3);ph=L(4);rad=L(5)*(chico()?1.3:1);upd();if(k>=1)anim=null;}
+  R.render(S,cam);requestAnimationFrame(loop);})();
 })();
 </script>
+
 </body>
 </html>
